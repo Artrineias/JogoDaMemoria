@@ -1,53 +1,40 @@
-function CriarCards() {
-    const quantidadeInput = 20;
+function CriarCards(valor) {
     const container = document.getElementById("cards");
-    container.innerHTML = ""; // limpa os cards anteriores
+    container.innerHTML = ""; 
 
-    // Exemplo de imagens (use links reais ou locais)
-    const imagens = [
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
-        "https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/detail/2.png",
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png",
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10.png",
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/39.png",
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/52.png",
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/63.png",
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/92.png",
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/133.png",
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/12.png",
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/37.png",
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/59.png",
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/61.png",
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/91.png",
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/134.png",
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
-        "https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/detail/002.png",
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png",
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10.png",
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/39.png",
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/52.png",
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/63.png",
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/92.png",
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/133.png",
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/12.png",
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/37.png",
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/59.png",
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/61.png",
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/91.png",
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/134.png"
-    ];
+    let imagens = new Set();
+    while (imagens.size < valor) {
+        const id = Math.floor(Math.random() * 150) + 1;
+        imagens.add(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`);
+    }
 
-    const selecionadas = imagens.slice(0, quantidadeInput);
-    const cartas = [...selecionadas, ...selecionadas]; // duplica para formar pares
+    const cartas = [...imagens, ...imagens]; 
+    cartas.sort(() => Math.random() - 0.5);  
 
-    // Embaralhar as cartas
-    cartas.sort(() => Math.random() - 0.5);
-
-    // Criar os elementos de card
     cartas.forEach((url, index) => {
         const card = document.createElement("div");
         card.className = "card";
-        card.innerHTML = `<img src="${url}" alt="pokemon-${index}" />`;
+
+        const inner = document.createElement("div");
+        inner.className = "card-inner";
+
+        const front = document.createElement("div");
+        front.className = "card-front";
+        front.innerHTML = `<img src="${url}" alt="pokemon-${index}" />`;
+
+        const back = document.createElement("div");
+        back.className = "card-back";
+        back.innerHTML = `<img src="Pokebola-pokeball-png-0.png" alt="">`; 
+
+        inner.appendChild(front);
+        inner.appendChild(back);
+        card.appendChild(inner);
+
+        // flipped
+        card.addEventListener("click", () => {
+            inner.classList.toggle("flipped");
+        });
+
         container.appendChild(card);
     });
 }
