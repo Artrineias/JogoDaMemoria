@@ -38,6 +38,11 @@ header nav label {
 
 /* -------- CARD FLIP -------- */
 
+.vida{
+    height: 20px;
+    width: 20px;
+}
+
 .card {
     width: 100px;
     height: 100px;

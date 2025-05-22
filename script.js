@@ -1,6 +1,9 @@
+let flippedCards = []; // lista para armazenar os cards virados
+let lockBoard = false; // impede clique enquanto verifica par
+
 function CriarCards(valor) {
     const container = document.getElementById("cards");
-    container.innerHTML = ""; 
+    container.innerHTML = "";
 
     let imagens = new Set();
     while (imagens.size < valor) {
@@ -8,8 +11,8 @@ function CriarCards(valor) {
         imagens.add(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`);
     }
 
-    const cartas = [...imagens, ...imagens]; 
-    cartas.sort(() => Math.random() - 0.5);  
+    const cartas = [...imagens, ...imagens];
+    cartas.sort(() => Math.random() - 0.5);
 
     cartas.forEach((url, index) => {
         const card = document.createElement("div");
@@ -24,17 +27,41 @@ function CriarCards(valor) {
 
         const back = document.createElement("div");
         back.className = "card-back";
-        back.innerHTML = `<img src="Pokebola-pokeball-png-0.png" alt="">`; 
+        back.innerHTML = `<img src="Pokebola-pokeball-png-0.png" alt="">`;
 
         inner.appendChild(front);
         inner.appendChild(back);
         card.appendChild(inner);
 
-        // flipped
+        // Evento de clique no card
         card.addEventListener("click", () => {
-            inner.classList.toggle("flipped");
+            if (lockBoard || inner.classList.contains("flipped")) return;
+
+            inner.classList.add("flipped");
+            flippedCards.push({ card, url });
+
+            if (flippedCards.length === 2) {
+                lockBoard = true;
+
+                const [first, second] = flippedCards;
+
+                if (first.url === second.url) {
+                    // Cartas iguais - manter viradas
+                    flippedCards = [];
+                    lockBoard = false;
+                } else {
+                    // Cartas diferentes - desvirar depois de um tempo
+                    setTimeout(() => {
+                        first.card.querySelector(".card-inner").classList.remove("flipped");
+                        second.card.querySelector(".card-inner").classList.remove("flipped");
+                        flippedCards = [];
+                        lockBoard = false;
+                    }, 500);
+                }
+            }
         });
 
         container.appendChild(card);
     });
 }
+
