@@ -1,9 +1,23 @@
-let flippedCards = []; // lista para armazenar os cards virados
-let lockBoard = false; // impede clique enquanto verifica par
+let flippedCards = [];
+let lockBoard = false;
+let errosSeguidos = 0;
+let nivelSelecionado = 1;
+let pontuacao = 0;
+let acertosSeguidos = 0;
+let modificadorErro = 1.0;
 
-function CriarCards(valor) {
+function CriarCards(valor, nivel = 1) {
+    nivelSelecionado = nivel;
+    errosSeguidos = 0;
+    pontuacao = 0;
+    acertosSeguidos = 0;
+    modificadorErro = 1.0;
+
     const container = document.getElementById("cards");
     container.innerHTML = "";
+  
+
+    atualizarPontuacao();
 
     let imagens = new Set();
     while (imagens.size < valor) {
@@ -33,7 +47,6 @@ function CriarCards(valor) {
         inner.appendChild(back);
         card.appendChild(inner);
 
-        // Evento de clique no card
         card.addEventListener("click", () => {
             if (lockBoard || inner.classList.contains("flipped")) return;
 
@@ -46,16 +59,41 @@ function CriarCards(valor) {
                 const [first, second] = flippedCards;
 
                 if (first.url === second.url) {
-                    // Cartas iguais - manter viradas
+                    // Acerto
+                    acertosSeguidos++;
+                    errosSeguidos = 0;
+
+                    // Calcula pontuação
+                    let pontosGanhos = 50 * Math.pow(2, acertosSeguidos - 1) * modificadorErro;
+                    pontuacao += Math.floor(pontosGanhos);
+                    modificadorErro = 1.0;
+
+                    atualizarPontuacao();
+
                     flippedCards = [];
                     lockBoard = false;
+
                 } else {
-                    // Cartas diferentes - desvirar depois de um tempo
+                    // Erro
+                    acertosSeguidos = 0;
+                    errosSeguidos++;
+                    modificadorErro /= 0.25;
+
                     setTimeout(() => {
                         first.card.querySelector(".card-inner").classList.remove("flipped");
                         second.card.querySelector(".card-inner").classList.remove("flipped");
                         flippedCards = [];
                         lockBoard = false;
+
+                        // Verifica embaralhamento
+                        if (
+                            (nivelSelecionado === 2 && errosSeguidos >= 5) ||
+                            (nivelSelecionado === 3 && errosSeguidos >= 3)
+                        ) {
+                            embaralharCards(container);
+                            errosSeguidos = 0;
+                        }
+
                     }, 500);
                 }
             }
@@ -65,3 +103,15 @@ function CriarCards(valor) {
     });
 }
 
+function embaralharCards(container) {
+    const cards = Array.from(container.children);
+    cards.sort(() => Math.random() - 0.5);
+    cards.forEach(card => container.appendChild(card));
+}
+
+function atualizarPontuacao() {
+    const pontosDiv = document.getElementById("pontuacao");
+    if (pontosDiv) {
+        pontosDiv.textContent = `Pontuação: ${pontuacao}`;
+    }
+}
